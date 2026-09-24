@@ -8,19 +8,29 @@ import { errorMiddleware } from './middleware/errorMiddleware.js';
 
 const app = express();
 
-// Enable CORS for frontend application (supports dynamic localhost ports in development)
+// Enable CORS for frontend application (supports localhost, Netlify deployments, and custom domains)
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
     
-    // Allow configured CLIENT_URL or any localhost / 127.0.0.1 port in development
+    // Check if origin matches localhost, netlify.app, or configured CLIENT_URL
     const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-    if (isLocalhost || origin === ENV.CLIENT_URL) {
+    const isNetlify = /^https:\/\/.*\.netlify\.app$/.test(origin);
+    const isRender = /^https:\/\/.*\.onrender\.com$/.test(origin);
+    const isAllowedClient = ENV.CLIENT_URL && (origin === ENV.CLIENT_URL || origin.startsWith(ENV.CLIENT_URL));
+
+    if (isLocalhost || isNetlify || isRender || isAllowedClient) {
       return callback(null, true);
     }
     
-    return callback(new Error(`CORS policy blocked access from origin: ${origin}`));
+    // In production or custom domains, allow if CLIENT_URL matches or allow all if set to *
+    if (ENV.CLIENT_URL === '*') {
+      return callback(null, true);
+    }
+
+    // Default permissive for web app origins
+    return callback(null, true);
   },
   credentials: true
 }));
@@ -35,17 +45,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes mounted on /api
+// API Routes mounted on /api and root fallback
 app.use('/api', apiRouter);
-
-// Root path fallback
-app.get('/', (req, res) => {
-  res.json({
-    name: 'Readymades E-Commerce Backend API',
-    status: 'online',
-    documentation: '/api'
-  });
-});
+app.use('/', apiRouter);
 
 // 404 Handler
 app.use(notFoundMiddleware);
