@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
+import { getProductImageUrl } from '../../config/env.js';
 
 /**
  * ProductCardThumbnail
@@ -10,9 +11,7 @@ const ProductCardThumbnail = ({ product, heightClass = 'h-48' }) => {
   const [imageError, setImageError] = useState(false);
 
   const hasSalesforceImage = Boolean(product?.imageUrl && !imageError);
-  const imageUrl = product?.imageUrl?.startsWith('http') 
-    ? product.imageUrl 
-    : `http://localhost:5000${product.imageUrl}`;
+  const imageUrl = getProductImageUrl(product?.imageUrl);
 
   return (
     <div className={`relative w-full ${heightClass} bg-gradient-to-br from-slate-50 to-amber-50/40 flex items-center justify-center overflow-hidden border-b border-slate-100`}>

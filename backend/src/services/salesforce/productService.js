@@ -120,6 +120,10 @@ export const sfProductService = {
     }
   },
 
+  async getImageBuffer(versionId) {
+    return this.fetchImageBuffer(versionId);
+  },
+
   /**
    * Upload a photo as ContentVersion attached to a Product2 record
    */

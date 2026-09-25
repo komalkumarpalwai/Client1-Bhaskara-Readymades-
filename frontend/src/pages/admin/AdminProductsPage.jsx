@@ -3,6 +3,7 @@ import api from '../../services/api.js';
 import AdminPagination from '../../components/admin/AdminPagination.jsx';
 import ProductCardThumbnail from '../../components/common/ProductCardThumbnail.jsx';
 import { Trash2, Plus, Image as ImageIcon, Upload, Eye } from 'lucide-react';
+import { getProductImageUrl } from '../../config/env.js';
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -304,7 +305,7 @@ const AdminProductsPage = () => {
                       <div className="w-10 h-10 border border-black overflow-hidden bg-gray-100 flex items-center justify-center">
                         {product.imageUrl ? (
                           <img
-                            src={product.imageUrl.startsWith('http') ? product.imageUrl : `http://localhost:5000${product.imageUrl}`}
+                            src={getProductImageUrl(product.imageUrl)}
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -392,7 +393,7 @@ const AdminProductsPage = () => {
                     </span>
                     <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                       {viewProduct.images.map((imgUrl, idx) => {
-                        const full = imgUrl.startsWith('http') ? imgUrl : `http://localhost:5000${imgUrl}`;
+                        const full = getProductImageUrl(imgUrl);
                         return (
                           <a
                             key={idx}
@@ -782,7 +783,7 @@ const AdminProductsPage = () => {
                       {editExistingPhotos.map((photo) => (
                         <div key={photo.versionId} className="relative border border-black p-1 bg-white aspect-square flex flex-col items-center justify-center">
                           <img
-                            src={photo.url.startsWith('http') ? photo.url : `http://localhost:5000${photo.url}`}
+                            src={getProductImageUrl(photo.url)}
                             alt={photo.title}
                             className="w-full h-full object-cover"
                           />

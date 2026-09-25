@@ -19,6 +19,7 @@ import {
 
 import api from '../../services/api.js';
 import { useCart } from '../../context/CartContext.jsx';
+import { getProductImageUrl } from '../../config/env.js';
 
 const SIZES_BY_CATEGORY = {
   Shirts: ['38 (S)', '40 (M)', '42 (L)', '44 (XL)', '46 (XXL)'],
@@ -173,7 +174,7 @@ const ProductDetailsPage = () => {
               {/* Main Full Image */}
               {activeImage ? (
                 <img
-                  src={activeImage.startsWith('http') ? activeImage : `http://localhost:5000${activeImage}`}
+                  src={getProductImageUrl(activeImage)}
                   alt={product.name}
                   className="w-full h-full object-contain p-2 transition-all duration-300 transform group-hover:scale-105"
                 />
@@ -239,7 +240,7 @@ const ProductDetailsPage = () => {
                 <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2.5 overflow-x-auto pb-1">
                   {galleryImages.map((imgUrl, idx) => {
                     const isSelected = selectedImageIndex === idx;
-                    const fullSrc = imgUrl.startsWith('http') ? imgUrl : `http://localhost:5000${imgUrl}`;
+                    const fullSrc = getProductImageUrl(imgUrl);
                     return (
                       <button
                         key={idx}
