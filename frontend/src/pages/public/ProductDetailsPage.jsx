@@ -22,6 +22,7 @@ import {
 import api from '../../services/api.js';
 import { useCart } from '../../context/CartContext.jsx';
 import { getProductImageUrl } from '../../config/env.js';
+import LoadingSpinner from '../../components/common/LoadingSpinner.jsx';
 
 const SIZES_BY_CATEGORY = {
   Shirts: ['38 (S)', '40 (M)', '42 (L)', '44 (XL)', '46 (XXL)'],
@@ -120,11 +121,8 @@ const ProductDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-amber-600 border-t-transparent mb-4"></div>
-        <p className="text-slate-600 font-mono text-sm uppercase tracking-widest">
-          Loading Garment Details...
-        </p>
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <LoadingSpinner message="Loading Garment Specifications & Photos..." minHeight="min-h-[400px]" />
       </div>
     );
   }
@@ -319,12 +317,20 @@ const ProductDetailsPage = () => {
                 <span className="text-3xl font-black text-slate-900">
                   {product.price}
                 </span>
-                <span className="text-xs text-slate-500 font-medium line-through">
-                  ₹{Math.round((product.numericPrice || 999) * 1.35)}
-                </span>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                  Special Store Price
-                </span>
+                {product.originalPrice > product.numericPrice && (
+                  <span className="text-sm text-slate-400 font-medium line-through">
+                    ₹{product.originalPrice}
+                  </span>
+                )}
+                {product.discountPercent > 0 ? (
+                  <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">
+                    {product.discountPercent}% OFF
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                    Special Store Price
+                  </span>
+                )}
               </div>
 
               {/* Description */}
@@ -435,12 +441,12 @@ const ProductDetailsPage = () => {
                 type="button"
                 onClick={() => {
                   const text = `Hi Bhaskara Readymades, I want to order / inquire about "${product.name}" (Size: ${selectedSize || 'Free Size'}, Qty: ${quantity}, Price: ${product.price}). Can you please assist me?`;
-                  window.open(`https://wa.me/918309897937?text=${encodeURIComponent(text)}`, '_blank');
+                  window.open(`https://wa.me/919396977779?text=${encodeURIComponent(text)}`, '_blank');
                 }}
                 className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all"
               >
                 <MessageCircle className="w-4 h-4 fill-white" />
-                <span>Buy / Inquire on WhatsApp (+91 8309897937)</span>
+                <span>Buy / Inquire on WhatsApp (+91 9396977779)</span>
               </button>
 
 

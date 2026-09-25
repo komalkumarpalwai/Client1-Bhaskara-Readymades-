@@ -148,8 +148,8 @@ const ContactPage = () => {
                 </div>
                 <div>
                   <strong className="block text-white font-semibold">Direct Customer Care & WhatsApp</strong>
-                  <p className="text-slate-300 mt-0.5">+91 8309897937 (Showroom & Orders)</p>
-                  <p className="text-slate-400 text-xs mt-0.5">+91 8309897937 (Ganapavaram Desk)</p>
+                  <p className="text-slate-300 mt-0.5">+91 9396977779 (Showroom & Orders)</p>
+                  <p className="text-slate-400 text-xs mt-0.5">+91 9396977779 (Ganapavaram Desk)</p>
                 </div>
               </div>
 

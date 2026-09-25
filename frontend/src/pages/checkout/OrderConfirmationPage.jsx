@@ -99,7 +99,7 @@ const OrderConfirmationPage = () => {
                 Your order is being processed and will be delivered directly to the shipping address provided.
               </p>
               <div className="pt-2 border-t border-slate-100 text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl">
-                For order tracking or delivery questions, our customer support desk is available at <strong>+91 8309897937</strong>.
+                For order tracking or delivery questions, our customer support desk is available at <strong>+91 9396977779</strong>.
               </div>
             </div>
           </div>

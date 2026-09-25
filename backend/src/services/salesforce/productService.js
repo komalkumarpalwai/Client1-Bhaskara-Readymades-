@@ -14,7 +14,7 @@ export const sfProductService = {
       const activeCondition = filters.all ? '' : ' AND IsActive = true';
       const soql = `
         SELECT Id, Name, ProductCode, Description, Family, StockKeepingUnit, 
-               Is_Custom_Product__c, Product_Price__c, IsActive, CreatedDate
+               Is_Custom_Product__c, Product_Price__c, Product_Discount_Price__c, IsActive, CreatedDate
         FROM Product2 
         WHERE Is_Custom_Product__c = true${activeCondition}
         ORDER BY CreatedDate DESC
@@ -61,6 +61,14 @@ export const sfProductService = {
       const formatted = productRecords.map((sfRec) => {
         const productImages = imagesByProduct[sfRec.Id] || [];
         const latestImg = productImages[0];
+        const originalPrice = sfRec.Product_Price__c != null ? Number(sfRec.Product_Price__c) : 0;
+        const discountPercent = sfRec.Product_Discount_Price__c != null ? Number(sfRec.Product_Discount_Price__c) : 0;
+        
+        // Calculate final discounted price: originalPrice - (originalPrice * discountPercent / 100)
+        const finalPrice = discountPercent > 0 
+          ? Math.max(0, Math.round(originalPrice - (originalPrice * discountPercent / 100)))
+          : originalPrice;
+
         return {
           id: sfRec.Id,
           name: sfRec.Name,
@@ -68,8 +76,11 @@ export const sfProductService = {
           sku: sfRec.StockKeepingUnit,
           description: sfRec.Description || '',
           category: sfRec.Family || 'General',
-          price: sfRec.Product_Price__c != null ? `₹${sfRec.Product_Price__c}` : '₹0',
-          numericPrice: sfRec.Product_Price__c || 0,
+          price: `₹${finalPrice}`,
+          numericPrice: finalPrice,
+          originalPrice: originalPrice,
+          discountPercent: discountPercent,
+          hasDiscount: discountPercent > 0,
           isCustom: sfRec.Is_Custom_Product__c,
           isActive: sfRec.IsActive,
           createdDate: sfRec.CreatedDate,
@@ -189,7 +200,8 @@ export const sfProductService = {
         StockKeepingUnit: productData.sku || productData.code || '',
         Family: productData.category || productData.family || 'Shirts',
         Description: productData.description || '',
-        Product_Price__c: parseFloat(productData.price || productData.numericPrice || 0),
+        Product_Price__c: parseFloat(productData.price || productData.originalPrice || productData.numericPrice || 0),
+        Product_Discount_Price__c: productData.discountPercent != null && productData.discountPercent !== '' ? parseFloat(productData.discountPercent) : 0,
         Is_Custom_Product__c: true,
         IsActive: productData.isActive !== false
       };
@@ -226,7 +238,7 @@ export const sfProductService = {
     try {
       const soql = `
         SELECT Id, Name, ProductCode, Description, Family, StockKeepingUnit, 
-               Is_Custom_Product__c, Product_Price__c, IsActive, CreatedDate, 
+               Is_Custom_Product__c, Product_Price__c, Product_Discount_Price__c, IsActive, CreatedDate, 
                LastModifiedDate, CreatedById, LastModifiedById
         FROM Product2 
         WHERE Id = '${productId}'
@@ -267,6 +279,11 @@ export const sfProductService = {
       }
 
       const latestImg = productImages[0];
+      const originalPrice = sfRec.Product_Price__c != null ? Number(sfRec.Product_Price__c) : 0;
+      const discountPercent = sfRec.Product_Discount_Price__c != null ? Number(sfRec.Product_Discount_Price__c) : 0;
+      const finalPrice = discountPercent > 0 
+        ? Math.max(0, Math.round(originalPrice - (originalPrice * discountPercent / 100)))
+        : originalPrice;
 
       return {
         id: sfRec.Id,
@@ -275,8 +292,11 @@ export const sfProductService = {
         sku: sfRec.StockKeepingUnit || '',
         description: sfRec.Description || '',
         category: sfRec.Family || 'General',
-        price: sfRec.Product_Price__c != null ? `₹${sfRec.Product_Price__c}` : '₹0',
-        numericPrice: sfRec.Product_Price__c || 0,
+        price: `₹${finalPrice}`,
+        numericPrice: finalPrice,
+        originalPrice: originalPrice,
+        discountPercent: discountPercent,
+        hasDiscount: discountPercent > 0,
         isCustom: sfRec.Is_Custom_Product__c,
         isActive: sfRec.IsActive,
         createdDate: sfRec.CreatedDate,
@@ -307,8 +327,11 @@ export const sfProductService = {
         payload.Family = productData.category || productData.family;
       }
       if (productData.description !== undefined) payload.Description = productData.description;
-      if (productData.price !== undefined || productData.numericPrice !== undefined) {
-        payload.Product_Price__c = parseFloat(productData.price || productData.numericPrice || 0);
+      if (productData.originalPrice !== undefined || productData.price !== undefined || productData.numericPrice !== undefined) {
+        payload.Product_Price__c = parseFloat(productData.originalPrice ?? productData.price ?? productData.numericPrice ?? 0);
+      }
+      if (productData.discountPercent !== undefined) {
+        payload.Product_Discount_Price__c = parseFloat(productData.discountPercent || 0);
       }
       if (productData.isActive !== undefined) payload.IsActive = Boolean(productData.isActive);
 

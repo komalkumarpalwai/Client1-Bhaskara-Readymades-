@@ -42,28 +42,28 @@ const AboutPage = () => {
 
   const categoryHighlights = [
     {
-      title: "Men's Collection",
-      tag: "Gentlemen's Fashion",
-      desc: "Formal & casual shirts, trousers, jeans, traditional dhotis, and festive kurta sets tailored for comfort and dignity.",
-      link: "/category/men",
-      bgGradient: "from-blue-900 to-indigo-950",
-      accent: "text-blue-300"
+      title: "Kids' Collection (Special Focus)",
+      tag: "Vibrant, Joyful & Full Sets",
+      desc: "Complete kids clothing destination: soft cotton daily wear, birthday gowns, party suits, ethnic pattu pavadas, and festive sets for boys and girls of all ages.",
+      link: "/category/kids",
+      bgGradient: "from-amber-900 to-orange-950",
+      accent: "text-amber-300"
     },
     {
-      title: "Women's Collection",
-      tag: "Elegance & Grace",
-      desc: "Exquisite handloom & daily wear sarees, trendy kurtis, anarkalis, dress materials, and fusion western wear.",
+      title: "Women's Collection (Complete Range)",
+      tag: "Elegance & Everyday Grace",
+      desc: "Complete womenswear: exquisite handloom & daily wear sarees, trendy kurtis, anarkalis, festive dress materials, tops, and bottom wear.",
       link: "/category/women",
       bgGradient: "from-rose-900 to-purple-950",
       accent: "text-rose-300"
     },
     {
-      title: "Kids' Collection",
-      tag: "Vibrant & Playful",
-      desc: "Soft cotton daily wear, birthday gowns, party suits, ethnic lehengas, and festive sets for boys and girls of all ages.",
-      link: "/category/kids",
-      bgGradient: "from-amber-900 to-orange-950",
-      accent: "text-amber-300"
+      title: "Men's Night Wear & Casuals",
+      tag: "Comfort Essentials",
+      desc: "Comfortable cotton nightwear, track pants, lungies, loungewear sets, and casual shirts for daily home comfort.",
+      link: "/category/men",
+      bgGradient: "from-slate-900 to-slate-950",
+      accent: "text-slate-300"
     }
   ];
 

@@ -34,12 +34,12 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Shop All', path: '/shop' },
-    { name: "Men's Wear", path: '/category/men' },
-    { name: "Women's Wear", path: '/category/women' },
     { name: "Kids' Wear", path: '/category/kids' },
+    { name: "Women's Wear", path: '/category/women' },
+    { name: 'Shop All', path: '/shop' },
     { name: 'New Arrivals', path: '/new-arrivals' },
     { name: 'Offers', path: '/offers', highlight: true },
+    { name: "Men's Night Wear", path: '/category/men' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -61,11 +61,14 @@ const Navbar = () => {
           {/* Quick Contact & Language Switcher at Top Right */}
           <div className="flex items-center space-x-3 text-slate-300">
             <span className="hidden lg:inline-flex items-center text-amber-300 text-[11px]">
-              <Sparkles className="w-3 h-3 mr-1" /> Complete Men's, Women's & Kids' Readymade Store
+              <Sparkles className="w-3 h-3 mr-1" /> Complete Kids' & Women's Wear • Men's Night Wear
             </span>
+            <a href="tel:+919396977779" className="hover:text-amber-400 transition-colors flex items-center text-[11px] font-semibold text-amber-300">
+              <Phone className="w-3 h-3 mr-1 text-emerald-400" /> +91 9396977779
+            </a>
             <span className="hidden sm:inline text-slate-600">|</span>
             <Link to="/contact" className="hover:text-amber-400 transition-colors flex items-center text-[11px]">
-              <Phone className="w-3 h-3 mr-1" /> Visit Store
+              Visit Store
             </Link>
             
             {/* Top Right English <-> Telugu Language Toggle Switch */}
@@ -87,22 +90,12 @@ const Navbar = () => {
       {/* Main Header Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
         {/* Logo and Brand */}
-        <Link to="/" className="flex items-center space-x-3 group shrink-0">
-          <div className="w-11 h-11 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white flex items-center justify-center p-0.5 group-hover:border-indigo-400 transition-colors">
-            <img 
-              src={logo} 
-              alt="Bhaskara Readymades" 
-              className="w-full h-full object-cover rounded"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
-              Bhaskara <span className="text-indigo-600 group-hover:text-slate-900">Readymades</span>
-            </span>
-            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider hidden sm:block">
-              Men • Women • Kids Clothing
-            </span>
-          </div>
+        <Link to="/" className="flex items-center group shrink-0 py-1">
+          <img 
+            src={logo} 
+            alt="Bhaskara Readymades" 
+            className="h-12 sm:h-16 md:h-18 max-w-[220px] sm:max-w-[280px] md:max-w-[320px] w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+          />
         </Link>
 
         {/* Search Bar - Desktop */}

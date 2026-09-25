@@ -26,9 +26,9 @@ const CheckoutPage = () => {
     phone: '',
     email: '',
     shippingAddress: '',
-    city: 'Ganapavaram',
-    state: 'Andhra Pradesh',
-    postalCode: '534198',
+    city: '',
+    state: '',
+    postalCode: '',
     notes: ''
   });
 
@@ -276,6 +276,7 @@ const CheckoutPage = () => {
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
+                      placeholder="e.g. Ganapavaram"
                       className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
                     />
                   </div>
@@ -287,6 +288,7 @@ const CheckoutPage = () => {
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
+                      placeholder="e.g. Andhra Pradesh"
                       className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
                     />
                   </div>
@@ -298,6 +300,7 @@ const CheckoutPage = () => {
                       name="postalCode"
                       value={formData.postalCode}
                       onChange={handleChange}
+                      placeholder="e.g. 534198"
                       className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
                     />
                   </div>

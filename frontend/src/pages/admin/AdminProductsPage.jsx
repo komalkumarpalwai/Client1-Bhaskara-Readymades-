@@ -35,6 +35,7 @@ const AdminProductsPage = () => {
     sku: '',
     category: 'Shirts',
     price: '',
+    discountPercent: 0,
     description: '',
     isActive: true,
     photos: [] // Array of { title, filename, base64Data }
@@ -92,7 +93,8 @@ const AdminProductsPage = () => {
           code: p.code || '',
           sku: p.sku || '',
           category: p.category || 'Shirts',
-          price: p.numericPrice || (p.price ? p.price.replace(/[^\d.]/g, '') : ''),
+          price: p.originalPrice ?? p.numericPrice ?? (p.price ? p.price.replace(/[^\d.]/g, '') : ''),
+          discountPercent: p.discountPercent ?? 0,
           description: p.description || '',
           isActive: p.isActive !== false
         });
@@ -179,7 +181,9 @@ const AdminProductsPage = () => {
         code: editProduct.code,
         sku: editProduct.sku,
         category: editProduct.category,
+        originalPrice: editProduct.price,
         price: editProduct.price,
+        discountPercent: editProduct.discountPercent,
         description: editProduct.description,
         isActive: editProduct.isActive,
         deletePhotos: editDeletePhotoIds,
@@ -217,6 +221,7 @@ const AdminProductsPage = () => {
           sku: '',
           category: 'Shirts',
           price: '',
+          discountPercent: 0,
           description: '',
           isActive: true,
           photos: []
@@ -317,6 +322,7 @@ const AdminProductsPage = () => {
                   <th className="py-2.5 px-3">Name</th>
                   <th className="py-2.5 px-3">Category</th>
                   <th className="py-2.5 px-3">Price</th>
+                  <th className="py-2.5 px-3">Discount (%)</th>
                   <th className="py-2.5 px-3">Photos</th>
                   <th className="py-2.5 px-3">Active</th>
                   <th className="py-2.5 px-3 text-right">Actions</th>
@@ -345,7 +351,25 @@ const AdminProductsPage = () => {
                         {product.category || 'General'}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-bold">{product.price}</td>
+                    <td className="py-2.5 px-3 font-bold">
+                      {product.hasDiscount ? (
+                        <div>
+                          <span className="text-black">{product.price}</span>
+                          <span className="text-gray-400 line-through text-[10px] block font-normal">₹{product.originalPrice}</span>
+                        </div>
+                      ) : (
+                        <span>{product.price}</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      {product.discountPercent > 0 ? (
+                        <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                          {product.discountPercent}% OFF
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">0%</span>
+                      )}
+                    </td>
                     <td className="py-2.5 px-3">
                       <span className="text-[10px] font-bold text-gray-700">
                         {product.images?.length || (product.imageUrl ? 1 : 0)} attached
@@ -465,7 +489,15 @@ const AdminProductsPage = () => {
                     <span className="font-bold">{viewProduct.category || '-'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500 block text-[10px] uppercase">Price (Product_Price__c)</span>
+                    <span className="text-gray-500 block text-[10px] uppercase">Original Item Price (Product_Price__c)</span>
+                    <span className="font-bold text-sm text-black">₹{viewProduct.originalPrice ?? viewProduct.numericPrice}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block text-[10px] uppercase">Discount Percentage (Product_Discount_Price__c)</span>
+                    <span className="font-bold text-sm text-emerald-700">{viewProduct.discountPercent || 0}% OFF</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block text-[10px] uppercase">Final Display Price</span>
                     <span className="font-bold text-sm text-black">{viewProduct.price}</span>
                   </div>
                   <div>
@@ -594,7 +626,7 @@ const AdminProductsPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block uppercase text-[10px] font-bold mb-1">Family / Category *</label>
                   <select
@@ -602,20 +634,21 @@ const AdminProductsPage = () => {
                     onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                     className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
                   >
-                    <option value="Shirts">Shirts</option>
-                    <option value="Trousers">Trousers</option>
+                    <option value="Boys Wear">Boys Wear (Kids)</option>
+                    <option value="Girls Wear">Girls Wear (Kids)</option>
+                    <option value="Kurtis">Kurtis (Women)</option>
+                    <option value="Sarees">Sarees (Women)</option>
+                    <option value="Dresses">Dresses (Women)</option>
+                    <option value="Tops">Tops (Women)</option>
+                    <option value="Bottom Wear">Bottom Wear (Women)</option>
                     <option value="Ethnic Wear">Ethnic Wear</option>
-                    <option value="Kurtis">Kurtis</option>
-                    <option value="Sarees">Sarees</option>
-                    <option value="Dresses">Dresses</option>
-                    <option value="Tops">Tops</option>
-                    <option value="Bottom Wear">Bottom Wear</option>
-                    <option value="Boys Wear">Boys Wear</option>
-                    <option value="Girls Wear">Girls Wear</option>
+                    <option value="Night Wear">Night Wear (Men)</option>
+                    <option value="Shirts">Shirts (Men)</option>
+                    <option value="Trousers">Trousers (Men)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block uppercase text-[10px] font-bold mb-1">Price (₹) *</label>
+                  <label className="block uppercase text-[10px] font-bold mb-1">Item Price (₹) *</label>
                   <input
                     type="number"
                     required
@@ -627,7 +660,30 @@ const AdminProductsPage = () => {
                     className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
                   />
                 </div>
+                <div>
+                  <label className="block uppercase text-[10px] font-bold mb-1">Discount (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    placeholder="0"
+                    value={newProduct.discountPercent}
+                    onChange={(e) => setNewProduct({ ...newProduct, discountPercent: e.target.value })}
+                    className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
+                  />
+                </div>
               </div>
+
+              {/* Calculated price preview if discount is entered */}
+              {Number(newProduct.discountPercent) > 0 && Number(newProduct.price) > 0 && (
+                <div className="p-2.5 bg-amber-50 border border-amber-300 rounded text-[11px] flex justify-between items-center text-amber-900">
+                  <span>Customer Pays (after {newProduct.discountPercent}% off):</span>
+                  <span className="font-bold text-sm">
+                    ₹{Math.max(0, Math.round(Number(newProduct.price) - (Number(newProduct.price) * Number(newProduct.discountPercent) / 100)))}
+                  </span>
+                </div>
+              )}
 
               <div>
                 <label className="block uppercase text-[10px] font-bold mb-1">Description</label>
@@ -778,7 +834,7 @@ const AdminProductsPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block uppercase text-[10px] font-bold mb-1">Family / Category *</label>
                   <select
@@ -786,20 +842,21 @@ const AdminProductsPage = () => {
                     onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
                     className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
                   >
-                    <option value="Shirts">Shirts</option>
-                    <option value="Trousers">Trousers</option>
+                    <option value="Boys Wear">Boys Wear (Kids)</option>
+                    <option value="Girls Wear">Girls Wear (Kids)</option>
+                    <option value="Kurtis">Kurtis (Women)</option>
+                    <option value="Sarees">Sarees (Women)</option>
+                    <option value="Dresses">Dresses (Women)</option>
+                    <option value="Tops">Tops (Women)</option>
+                    <option value="Bottom Wear">Bottom Wear (Women)</option>
                     <option value="Ethnic Wear">Ethnic Wear</option>
-                    <option value="Kurtis">Kurtis</option>
-                    <option value="Sarees">Sarees</option>
-                    <option value="Dresses">Dresses</option>
-                    <option value="Tops">Tops</option>
-                    <option value="Bottom Wear">Bottom Wear</option>
-                    <option value="Boys Wear">Boys Wear</option>
-                    <option value="Girls Wear">Girls Wear</option>
+                    <option value="Night Wear">Night Wear (Men)</option>
+                    <option value="Shirts">Shirts (Men)</option>
+                    <option value="Trousers">Trousers (Men)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block uppercase text-[10px] font-bold mb-1">Price (₹) *</label>
+                  <label className="block uppercase text-[10px] font-bold mb-1">Item Price (₹) *</label>
                   <input
                     type="number"
                     required
@@ -810,7 +867,32 @@ const AdminProductsPage = () => {
                     className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
                   />
                 </div>
+                <div>
+                  <label className="block uppercase text-[10px] font-bold mb-1">Discount (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={editProduct.discountPercent}
+                    onChange={(e) => setEditProduct({ ...editProduct, discountPercent: e.target.value })}
+                    className="w-full border border-black p-2 bg-white text-xs focus:outline-none"
+                  />
+                </div>
               </div>
+
+              {/* Calculated price preview if discount is entered */}
+              {Number(editProduct.discountPercent) > 0 && Number(editProduct.price) > 0 && (
+                <div className="p-2.5 bg-amber-50 border border-amber-300 rounded text-[11px] flex justify-between items-center text-amber-900">
+                  <span>Customer Pays (after {editProduct.discountPercent}% off):</span>
+                  <div className="text-right">
+                    <span className="font-bold text-sm">
+                      ₹{Math.max(0, Math.round(Number(editProduct.price) - (Number(editProduct.price) * Number(editProduct.discountPercent) / 100)))}
+                    </span>
+                    <span className="text-[10px] text-gray-500 line-through ml-2">₹{editProduct.price}</span>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block uppercase text-[10px] font-bold mb-1">Description</label>

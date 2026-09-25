@@ -4,6 +4,7 @@ import { ShoppingBag, Sparkles, Check, ArrowUpDown } from 'lucide-react';
 import api from '../../services/api.js';
 import { useCart } from '../../context/CartContext.jsx';
 import ProductCardThumbnail from '../../components/common/ProductCardThumbnail.jsx';
+import LoadingSpinner from '../../components/common/LoadingSpinner.jsx';
 
 const NewArrivalsPage = () => {
   const [products, setProducts] = useState([]);
@@ -115,10 +116,7 @@ const NewArrivalsPage = () => {
 
         {/* Grid */}
         {loading ? (
-          <div className="py-24 text-center space-y-3">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-600 border-t-transparent"></div>
-            <p className="text-xs font-mono uppercase text-slate-500">Fetching latest stock arrivals...</p>
-          </div>
+          <LoadingSpinner message="Fetching Latest Stock Arrivals from Showroom..." />
         ) : filteredProducts.length === 0 ? (
           <div className="py-20 text-center text-sm text-slate-500 bg-white border border-slate-200 rounded-2xl space-y-3">
             <p className="font-bold text-slate-800">No new arrival garments found.</p>
@@ -157,18 +155,26 @@ const NewArrivalsPage = () => {
                     </p>
                   </div>
 
-                  <div className="space-y-3 pt-3 border-t border-slate-100">
-                    <div className="flex items-baseline justify-between">
-                      <div>
-                        <span className="text-lg font-black text-slate-900">{product.price}</span>
-                        <span className="text-[11px] text-slate-400 line-through ml-2">
-                          ₹{Math.round((product.numericPrice || 999) * 1.35)}
-                        </span>
+                    <div className="space-y-3 pt-3 border-t border-slate-100">
+                      <div className="flex items-baseline justify-between">
+                        <div>
+                          <span className="text-lg font-black text-slate-900">{product.price}</span>
+                          {product.originalPrice > product.numericPrice && (
+                            <span className="text-[11px] text-slate-400 line-through ml-2">
+                              ₹{product.originalPrice}
+                            </span>
+                          )}
+                        </div>
+                        {product.discountPercent > 0 ? (
+                          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
+                            {product.discountPercent}% OFF
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                            Available
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        Available
-                      </span>
-                    </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <Link

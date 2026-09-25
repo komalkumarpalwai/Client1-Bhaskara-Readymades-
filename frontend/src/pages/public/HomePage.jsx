@@ -19,21 +19,22 @@ import api from '../../services/api.js';
 import { useCart } from '../../context/CartContext.jsx';
 import ProductCardThumbnail from '../../components/common/ProductCardThumbnail.jsx';
 import StorefrontPagination from '../../components/common/StorefrontPagination.jsx';
+import LoadingSpinner from '../../components/common/LoadingSpinner.jsx';
 import { showroomBanner } from '../../assets/index.js';
 
 const CATEGORY_GROUPS = [
+  { id: 'kids', name: "Kids' Readymades (Full Collection)", filter: ['Boys Wear', 'Girls Wear'] },
+  { id: 'women', name: "Women's Collection (Sarees, Kurtis & Dresses)", filter: ['Kurtis', 'Sarees', 'Dresses', 'Tops', 'Bottom Wear'] },
   { id: 'all', name: 'All Collections' },
-  { id: 'shirts', name: 'Men - Shirts', filter: ['Shirts'] },
   { id: 'ethnic', name: 'Ethnic & Festive', filter: ['Ethnic Wear', 'Sarees'] },
-  { id: 'women', name: "Women's Kurtis & Dresses", filter: ['Kurtis', 'Dresses', 'Tops', 'Bottom Wear'] },
-  { id: 'kids', name: "Kids' Readymades", filter: ['Boys Wear', 'Girls Wear'] }
+  { id: 'men', name: "Men's Night Wear & Casuals", filter: ['Night Wear', 'Shirts', 'Trousers'] }
 ];
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('kids');
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 8;
   const [addedToastId, setAddedToastId] = useState(null);
@@ -207,10 +208,7 @@ const HomePage = () => {
 
         {/* Product Grid */}
         {loading ? (
-          <div className="py-20 text-center space-y-3">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-600 border-t-transparent"></div>
-            <p className="text-xs font-mono uppercase text-slate-500">Retrieving Live Garments Catalogue...</p>
-          </div>
+          <LoadingSpinner message="Retrieving Live Garments Catalogue..." minHeight="min-h-[260px]" />
         ) : filteredProducts.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-2xl">
             No products found in this category collection.
@@ -246,13 +244,21 @@ const HomePage = () => {
                       <div className="flex items-baseline justify-between">
                         <div>
                           <span className="text-lg font-black text-slate-900">{product.price}</span>
-                          <span className="text-[11px] text-slate-400 line-through ml-2">
-                            ₹{Math.round((product.numericPrice || 999) * 1.35)}
-                          </span>
+                          {product.originalPrice > product.numericPrice && (
+                            <span className="text-[11px] text-slate-400 line-through ml-2">
+                              ₹{product.originalPrice}
+                            </span>
+                          )}
                         </div>
-                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                          Available
-                        </span>
+                        {product.discountPercent > 0 ? (
+                          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
+                            {product.discountPercent}% OFF
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                            Available
+                          </span>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
@@ -302,30 +308,30 @@ const HomePage = () => {
         )}
       </section>
 
-      {/* MEN'S COLLECTION SHOWCASE ROW */}
-      {mensProducts.length > 0 && (
-        <section className="bg-slate-100 py-12 border-y border-slate-200">
+      {/* KIDS' COLLECTION SHOWCASE ROW (PRIORITY #1) */}
+      {kidsProducts.length > 0 && (
+        <section className="bg-amber-50/50 py-12 border-y border-amber-200/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-xs font-mono font-bold uppercase text-amber-700">Gentlemen's Wardrobe</span>
-                <h2 className="text-2xl font-extrabold text-slate-900">Men's Shirts & Ethnic Collection</h2>
+                <span className="text-xs font-mono font-bold uppercase text-amber-700">Joyful Readymades & Festive Sets</span>
+                <h2 className="text-2xl font-extrabold text-slate-900">Kids' Boys & Girls Wear (Full Collection)</h2>
               </div>
-              <Link to="/category/men" className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center space-x-1">
-                <span>View All ({mensProducts.length})</span>
+              <Link to="/category/kids" className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center space-x-1">
+                <span>View All ({kidsProducts.length})</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {mensProducts.slice(0, 4).map((product) => (
+              {kidsProducts.slice(0, 4).map((product) => (
                 <div key={product.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
                   <Link to={`/products/${product.id}`} className="block">
                     <ProductCardThumbnail product={product} heightClass="h-40" />
                   </Link>
                   <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                      <span className="text-[10px] font-mono uppercase bg-orange-50 text-orange-800 px-2 py-0.5 rounded">
                         {product.category}
                       </span>
                       <Link to={`/products/${product.id}`}>
@@ -354,13 +360,13 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* WOMEN'S COLLECTION SHOWCASE ROW */}
+      {/* WOMEN'S COLLECTION SHOWCASE ROW (PRIORITY #2) */}
       {womensProducts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
           <div className="flex justify-between items-end">
             <div>
-              <span className="text-xs font-mono font-bold uppercase text-amber-700">Ethnic & Contemporary</span>
-              <h2 className="text-2xl font-extrabold text-slate-900">Women's Sarees, Kurtis & Dresses</h2>
+              <span className="text-xs font-mono font-bold uppercase text-amber-700">Ethnic & Contemporary Elegance</span>
+              <h2 className="text-2xl font-extrabold text-slate-900">Women's Sarees, Kurtis & Dresses (Full Collection)</h2>
             </div>
             <Link to="/category/women" className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center space-x-1">
               <span>View All ({womensProducts.length})</span>
@@ -404,30 +410,30 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* KIDS' COLLECTION SHOWCASE ROW */}
-      {kidsProducts.length > 0 && (
-        <section className="bg-amber-50/50 py-12 border-y border-amber-200/60">
+      {/* MEN'S NIGHT WEAR SHOWCASE ROW (POSITIONED AT LAST) */}
+      {mensProducts.length > 0 && (
+        <section className="bg-slate-100 py-12 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-xs font-mono font-bold uppercase text-amber-700">Joyful Readymades</span>
-                <h2 className="text-2xl font-extrabold text-slate-900">Kids' Boys & Girls Wear</h2>
+                <span className="text-xs font-mono font-bold uppercase text-slate-500">Comfort Essentials</span>
+                <h2 className="text-2xl font-extrabold text-slate-900">Men's Night Wear & Daily Casuals</h2>
               </div>
-              <Link to="/category/kids" className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center space-x-1">
-                <span>View All ({kidsProducts.length})</span>
+              <Link to="/category/men" className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center space-x-1">
+                <span>View All ({mensProducts.length})</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {kidsProducts.slice(0, 4).map((product) => (
+              {mensProducts.slice(0, 4).map((product) => (
                 <div key={product.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
                   <Link to={`/products/${product.id}`} className="block">
                     <ProductCardThumbnail product={product} heightClass="h-40" />
                   </Link>
                   <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono uppercase bg-orange-50 text-orange-800 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-600">
                         {product.category}
                       </span>
                       <Link to={`/products/${product.id}`}>

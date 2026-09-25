@@ -4,6 +4,7 @@ import { ShoppingBag, Sparkles, Check, ArrowUpDown, Tag, Percent } from 'lucide-
 import api from '../../services/api.js';
 import { useCart } from '../../context/CartContext.jsx';
 import ProductCardThumbnail from '../../components/common/ProductCardThumbnail.jsx';
+import LoadingSpinner from '../../components/common/LoadingSpinner.jsx';
 
 const OffersPage = () => {
   const [products, setProducts] = useState([]);
@@ -19,7 +20,9 @@ const OffersPage = () => {
         setLoading(true);
         const res = await api.get('/products');
         const all = res.data?.products || res.products || [];
-        setProducts(all);
+        // Show ONLY products with discount percentage > 0
+        const discounted = all.filter((p) => Number(p.discountPercent) > 0);
+        setProducts(discounted);
       } catch (err) {
         console.error('Failed to load Offers:', err);
       } finally {
@@ -41,6 +44,7 @@ const OffersPage = () => {
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === 'price-low') return (a.numericPrice || 0) - (b.numericPrice || 0);
     if (sortBy === 'price-high') return (b.numericPrice || 0) - (a.numericPrice || 0);
+    if (sortBy === 'discount-high') return (b.discountPercent || 0) - (a.discountPercent || 0);
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     return 0;
   });
@@ -60,7 +64,7 @@ const OffersPage = () => {
               Special Showroom Offers & Festive Deals
             </h1>
             <p className="text-amber-100 text-xs sm:text-sm">
-              Enjoy exclusive showroom pricing across our complete collection of Men's, Women's, and Kids' readymade garments.
+              Enjoy exclusive showroom discounts across our collection of Men's, Women's, and Kids' readymade garments.
             </p>
           </div>
         </div>
@@ -70,13 +74,13 @@ const OffersPage = () => {
           <div className="flex items-center space-x-2">
             <Tag className="w-5 h-5 text-amber-600" />
             <h2 className="text-lg font-extrabold text-slate-900">
-              Discounted Garments & Deals
+              Active Discount Offers
             </h2>
           </div>
 
           <div className="flex items-center space-x-3">
             <span className="text-xs font-mono bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700 font-bold shadow-sm">
-              {loading ? 'LOADING...' : `${sortedProducts.length} OFFER ITEMS`}
+              {loading ? 'LOADING...' : `${sortedProducts.length} DISCOUNTED ITEMS`}
             </span>
 
             <div className="flex items-center space-x-2">
@@ -90,6 +94,7 @@ const OffersPage = () => {
                 className="bg-white border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none"
               >
                 <option value="default">Featured</option>
+                <option value="discount-high">Highest Discount %</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="name">Name (A-Z)</option>
@@ -100,15 +105,13 @@ const OffersPage = () => {
 
         {/* Grid */}
         {loading ? (
-          <div className="py-24 text-center space-y-3">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-600 border-t-transparent"></div>
-            <p className="text-xs font-mono uppercase text-slate-500">Loading showroom offers & discounts...</p>
-          </div>
+          <LoadingSpinner message="Loading Showroom Discounts & Festive Offers..." />
         ) : sortedProducts.length === 0 ? (
           <div className="py-20 text-center text-sm text-slate-500 bg-white border border-slate-200 rounded-2xl space-y-3">
-            <p className="font-bold text-slate-800">No active promotional garments found.</p>
-            <Link to="/shop" className="text-xs font-bold text-amber-700 underline">
-              Browse All Products
+            <p className="font-bold text-slate-800">No active discounted garments right now.</p>
+            <p className="text-xs text-slate-400">Products with a discount percentage added in Salesforce will appear here automatically.</p>
+            <Link to="/shop" className="inline-block mt-2 text-xs font-bold text-amber-700 underline">
+              Browse All Products in Catalogue
             </Link>
           </div>
         ) : (
@@ -122,8 +125,8 @@ const OffersPage = () => {
                   <Link to={`/products/${product.id}`} className="block">
                     <ProductCardThumbnail product={product} heightClass="h-48" />
                   </Link>
-                  <div className="absolute top-2.5 right-2.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">
-                    SAVE 25%
+                  <div className="absolute top-2.5 right-2.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow">
+                    {product.discountPercent}% OFF
                   </div>
                 </div>
 
@@ -146,12 +149,14 @@ const OffersPage = () => {
                     <div className="flex items-baseline justify-between">
                       <div>
                         <span className="text-lg font-black text-rose-600">{product.price}</span>
-                        <span className="text-xs text-slate-400 line-through ml-2">
-                          ₹{Math.round((product.numericPrice || 999) * 1.35)}
-                        </span>
+                        {product.originalPrice > product.numericPrice && (
+                          <span className="text-xs text-slate-400 line-through ml-2">
+                            ₹{product.originalPrice}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[10px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
-                        Special Price
+                      <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
+                        Save {product.discountPercent}%
                       </span>
                     </div>
 

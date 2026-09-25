@@ -11,7 +11,7 @@ const WhatsAppFloatingWidget = () => {
   const popupRef = useRef(null);
   const btnRef = useRef(null);
 
-  const phoneNumber = '918309897937'; // 8309897937
+  const phoneNumber = '919396977779'; // 9396977779
 
   // GSAP subtle pulse on button entry
   useGSAP(() => {
@@ -147,7 +147,7 @@ const WhatsAppFloatingWidget = () => {
           {/* Footer Hotline */}
           <div className="px-4 py-2 bg-slate-100 text-[10px] text-slate-500 text-center flex items-center justify-center space-x-1.5 border-t border-slate-200/60">
             <Phone className="w-3 h-3 text-emerald-600" />
-            <span>Direct WhatsApp & Call: <strong>+91 8309897937</strong></span>
+            <span>Direct WhatsApp & Call: <strong>+91 9396977779</strong></span>
           </div>
 
         </div>

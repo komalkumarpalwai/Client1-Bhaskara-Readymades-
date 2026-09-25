@@ -66,14 +66,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand Info (2 columns on large screens) */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-700 bg-white p-0.5 shrink-0">
-                <img src={logo} alt="Bhaskara Readymades Logo" className="w-full h-full object-cover rounded" />
-              </div>
-              <div>
-                <h3 className="text-white text-lg font-bold tracking-tight">Bhaskara Readymades</h3>
-                <p className="text-xs text-indigo-400 font-medium">Family Clothing Store</p>
-              </div>
+            <div className="flex items-center">
+              <img 
+                src={logo} 
+                alt="Bhaskara Readymades" 
+                className="h-16 sm:h-20 w-auto max-w-[280px] object-contain bg-white/95 p-1.5 rounded-lg shadow-sm" 
+              />
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed pr-4">
@@ -92,6 +90,12 @@ const Footer = () => {
                 <Clock className="w-4 h-4 text-indigo-400 shrink-0" />
                 <span>Open All Days: 9:00 AM – 9:30 PM</span>
               </div>
+              <div className="flex items-center space-x-2 text-slate-300">
+                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                <a href="tel:+919396977779" className="hover:text-amber-400 transition-colors font-semibold text-white">
+                  +91 9396977779 (Call & WhatsApp)
+                </a>
+              </div>
             </div>
           </div>
 
@@ -102,18 +106,13 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link to="/category/men" className="hover:text-amber-400 transition-colors flex items-center">
-                  <ArrowRight className="w-3 h-3 mr-1 text-slate-600" /> Men's Clothing
+                <Link to="/category/kids" className="hover:text-amber-400 transition-colors flex items-center font-semibold text-amber-300">
+                  <ArrowRight className="w-3 h-3 mr-1 text-amber-400" /> Kids' Clothing (Full Range)
                 </Link>
               </li>
               <li>
-                <Link to="/category/women" className="hover:text-amber-400 transition-colors flex items-center">
-                  <ArrowRight className="w-3 h-3 mr-1 text-slate-600" /> Women's Clothing
-                </Link>
-              </li>
-              <li>
-                <Link to="/category/kids" className="hover:text-amber-400 transition-colors flex items-center">
-                  <ArrowRight className="w-3 h-3 mr-1 text-slate-600" /> Kids' Clothing
+                <Link to="/category/women" className="hover:text-amber-400 transition-colors flex items-center font-semibold text-amber-300">
+                  <ArrowRight className="w-3 h-3 mr-1 text-amber-400" /> Women's Clothing (Complete)
                 </Link>
               </li>
               <li>
@@ -124,6 +123,11 @@ const Footer = () => {
               <li>
                 <Link to="/offers" className="hover:text-amber-400 transition-colors flex items-center text-amber-400 font-medium">
                   <ArrowRight className="w-3 h-3 mr-1 text-slate-600" /> Festive Offers
+                </Link>
+              </li>
+              <li>
+                <Link to="/category/men" className="hover:text-amber-400 transition-colors flex items-center text-slate-400">
+                  <ArrowRight className="w-3 h-3 mr-1 text-slate-600" /> Men's Night Wear
                 </Link>
               </li>
             </ul>
