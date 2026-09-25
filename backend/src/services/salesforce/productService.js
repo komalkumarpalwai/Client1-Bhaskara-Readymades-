@@ -11,11 +11,12 @@ export const sfProductService = {
    */
   async fetchProducts(filters = {}) {
     try {
+      const activeCondition = filters.all ? '' : ' AND IsActive = true';
       const soql = `
         SELECT Id, Name, ProductCode, Description, Family, StockKeepingUnit, 
                Is_Custom_Product__c, Product_Price__c, IsActive, CreatedDate
         FROM Product2 
-        WHERE Is_Custom_Product__c = true
+        WHERE Is_Custom_Product__c = true${activeCondition}
         ORDER BY CreatedDate DESC
       `;
       
@@ -371,7 +372,7 @@ export const sfProductService = {
         SELECT Id, Name, ProductCode, Description, Family, StockKeepingUnit, 
                Is_Custom_Product__c, Product_Price__c, IsActive 
         FROM Product2 
-        WHERE Is_Custom_Product__c = true AND Family = '${category}'
+        WHERE Is_Custom_Product__c = true AND IsActive = true AND Family = '${category}'
       `;
       const result = await salesforceClient.query(soql);
       return result.records || [];

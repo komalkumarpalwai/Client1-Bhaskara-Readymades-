@@ -234,6 +234,30 @@ const AdminProductsPage = () => {
     }
   };
 
+  // Handle Product Deletion from Salesforce
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+
+  const handleDeleteProduct = async (productId, productName) => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to permanently delete "${productName || productId}" from Salesforce?\n\nThis will also remove attached photos.`
+    );
+    if (!isConfirmed) return;
+
+    try {
+      setDeleteLoadingId(productId);
+      await api.delete(`/admin/products/${productId}`);
+      // Refresh products list
+      fetchProducts();
+      // If modal was open for this product, close it
+      if (viewProduct?.id === productId) setViewProduct(null);
+      if (editProduct?.id === productId) setEditProduct(null);
+    } catch (err) {
+      alert(`Failed to delete product: ${err.message || 'Error occurred while communicating with Salesforce.'}`);
+    } finally {
+      setDeleteLoadingId(null);
+    }
+  };
+
   // Compute paginated items
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedProducts = products.slice(startIndex, startIndex + pageSize);
@@ -334,7 +358,7 @@ const AdminProductsPage = () => {
                         <span className="text-gray-400">○ NO</span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 text-right space-x-2">
+                    <td className="py-2.5 px-3 text-right space-x-1.5 whitespace-nowrap">
                       <button
                         onClick={() => handleOpenView(product.id)}
                         className="border border-black px-2 py-1 text-[11px] uppercase hover:bg-black hover:text-white transition font-bold inline-flex items-center space-x-1"
@@ -347,6 +371,15 @@ const AdminProductsPage = () => {
                         className="border border-black px-2 py-1 text-[11px] uppercase hover:bg-black hover:text-white transition font-bold"
                       >
                         Edit / Photos
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id, product.name)}
+                        disabled={deleteLoadingId === product.id}
+                        className="border border-red-600 text-red-600 px-2 py-1 text-[11px] uppercase hover:bg-red-600 hover:text-white transition font-bold inline-flex items-center space-x-1 disabled:opacity-50"
+                        title="Delete product from Salesforce"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>{deleteLoadingId === product.id ? 'Deleting...' : 'Delete'}</span>
                       </button>
                     </td>
                   </tr>
@@ -456,6 +489,40 @@ const AdminProductsPage = () => {
                 <div className="border border-black p-4">
                   <span className="text-gray-500 block text-[10px] uppercase mb-1">Description</span>
                   <p className="text-gray-800 text-xs leading-relaxed whitespace-pre-wrap">{viewProduct.description || 'No description entered.'}</p>
+                </div>
+
+                {/* Modal Actions Footer */}
+                <div className="pt-3 border-t border-black flex justify-between items-center">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProduct(viewProduct.id, viewProduct.name)}
+                    disabled={deleteLoadingId === viewProduct.id}
+                    className="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 uppercase text-xs font-mono font-bold transition flex items-center space-x-1.5 disabled:opacity-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{deleteLoadingId === viewProduct.id ? 'Deleting...' : 'Delete Product'}</span>
+                  </button>
+
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const pid = viewProduct.id;
+                        setViewProduct(null);
+                        handleOpenEdit(pid);
+                      }}
+                      className="bg-black text-white px-4 py-1.5 uppercase text-xs font-mono font-bold hover:bg-neutral-800"
+                    >
+                      Edit Product / Photos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewProduct(null)}
+                      className="border border-black px-4 py-1.5 uppercase text-xs font-mono hover:bg-gray-100"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : null}

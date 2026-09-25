@@ -7,7 +7,7 @@ export const adminController = {
   // Products
   getProducts: async (req, res, next) => {
     try {
-      const products = await productService.getAllProducts(req.query);
+      const products = await productService.getAllProducts({ all: true, ...req.query });
       return sendSuccess(res, 200, 'Admin products list ready', { products });
     } catch (err) {
       next(err);
