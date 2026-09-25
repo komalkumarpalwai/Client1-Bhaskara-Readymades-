@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { 
   ShoppingBag, 
   Sparkles, 
@@ -40,6 +42,21 @@ const ShopPage = () => {
   const [addedToastId, setAddedToastId] = useState(null);
 
   const { addToCart } = useCart();
+  const shopGridRef = useRef(null);
+
+  // GSAP animation for product grid on filter / category / page change
+  useGSAP(() => {
+    if (!loading && products.length > 0) {
+      gsap.from('.gsap-shop-card', {
+        y: 30,
+        opacity: 0,
+        stagger: 0.06,
+        duration: 0.6,
+        ease: 'power2.out',
+        clearProps: 'transform,opacity'
+      });
+    }
+  }, { dependencies: [loading, selectedCategory, searchFilter, sortBy, currentPage], scope: shopGridRef });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -196,12 +213,12 @@ const ShopPage = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div ref={shopGridRef} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {paginatedProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
+                  className="gsap-shop-card bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
                 >
                   {/* Visual Header / Thumbnail Image */}
                   <Link to={`/products/${product.id}`} className="block">

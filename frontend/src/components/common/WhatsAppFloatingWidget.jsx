@@ -1,11 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { MessageCircle, X, Send, Sparkles, Phone, ArrowUpRight } from 'lucide-react';
 
 const WhatsAppFloatingWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
 
+  const widgetRef = useRef(null);
+  const popupRef = useRef(null);
+  const btnRef = useRef(null);
+
   const phoneNumber = '918309897937'; // 8309897937
+
+  // GSAP subtle pulse on button entry
+  useGSAP(() => {
+    gsap.from(btnRef.current, {
+      scale: 0,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'back.out(1.7)',
+      delay: 0.5
+    });
+  }, { scope: widgetRef });
+
+  // GSAP smooth entrance on popup open
+  useGSAP(() => {
+    if (isOpen && popupRef.current) {
+      gsap.from(popupRef.current, {
+        scale: 0.85,
+        opacity: 0,
+        y: 20,
+        duration: 0.4,
+        ease: 'power3.out'
+      });
+    }
+  }, { dependencies: [isOpen], scope: widgetRef });
 
   const quickInquiries = [
     'Hi Bhaskara Readymades, I want to check latest festive collections.',
@@ -30,11 +60,11 @@ const WhatsAppFloatingWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end notranslate">
+    <div ref={widgetRef} className="fixed bottom-6 right-6 z-50 flex flex-col items-end notranslate">
       
       {/* Floating Popup Card */}
       {isOpen && (
-        <div className="mb-4 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden animate-fadeIn duration-200">
+        <div ref={popupRef} className="mb-4 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden">
           
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-4 text-white flex items-center justify-between">
@@ -125,6 +155,7 @@ const WhatsAppFloatingWidget = () => {
 
       {/* Main Floating Trigger Button */}
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="group relative flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 px-4 sm:px-5 rounded-full shadow-2xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300 border-2 border-white"

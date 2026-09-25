@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { 
   ShoppingBag, 
   Check, 
@@ -47,6 +49,32 @@ const ProductDetailsPage = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [addedToast, setAddedToast] = useState(false);
+
+  const detailsContainerRef = useRef(null);
+
+  // GSAP animation for product details entrance
+  useGSAP(() => {
+    if (!loading && product) {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.7 } });
+      tl.from('.gsap-detail-gallery', { opacity: 0, x: -30, duration: 0.8 })
+        .from('.gsap-detail-badge', { opacity: 0, y: -10, duration: 0.4 }, '-=0.5')
+        .from('.gsap-detail-title', { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
+        .from('.gsap-detail-price', { opacity: 0, y: 15, duration: 0.5 }, '-=0.4')
+        .from('.gsap-detail-sizes', { opacity: 0, y: 15, duration: 0.5 }, '-=0.3')
+        .from('.gsap-detail-actions', { opacity: 0, y: 20, duration: 0.6 }, '-=0.3')
+        .from('.gsap-detail-features', { opacity: 0, y: 15, duration: 0.5 }, '-=0.3');
+    }
+  }, { dependencies: [loading, product?.id], scope: detailsContainerRef });
+
+  // GSAP image swap effect
+  useGSAP(() => {
+    if (product) {
+      gsap.fromTo('.gsap-active-img', 
+        { opacity: 0.6, scale: 0.98 }, 
+        { opacity: 1, scale: 1, duration: 0.35, ease: 'power2.out' }
+      );
+    }
+  }, { dependencies: [selectedImageIndex], scope: detailsContainerRef });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -151,10 +179,10 @@ const ProductDetailsPage = () => {
         </div>
 
         {/* Product Details Main Card */}
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10">
+        <div ref={detailsContainerRef} className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10">
           
           {/* Left: Product Visual Presentation (Multi-image Hero Gallery) */}
-          <div className="lg:col-span-6 flex flex-col space-y-4">
+          <div className="gsap-detail-gallery lg:col-span-6 flex flex-col space-y-4">
             
             {/* Main Stage Image Container */}
             <div className="relative w-full aspect-square bg-slate-950/5 rounded-2xl border border-slate-200/80 overflow-hidden flex items-center justify-center group shadow-inner">
@@ -176,7 +204,7 @@ const ProductDetailsPage = () => {
                 <img
                   src={getProductImageUrl(activeImage)}
                   alt={product.name}
-                  className="w-full h-full object-contain p-2 transition-all duration-300 transform group-hover:scale-105"
+                  className="gsap-active-img w-full h-full object-contain p-2 transition-all duration-300 transform group-hover:scale-105"
                 />
               ) : (
                 <div className="text-center space-y-4 z-10 p-8">
@@ -227,7 +255,7 @@ const ProductDetailsPage = () => {
               )}
             </div>
 
-            {/* Thumbnail Strip Gallery (Like Real-Time E-commerce Websites) */}
+            {/* Thumbnail Strip Gallery */}
             {galleryImages.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
@@ -274,11 +302,11 @@ const ProductDetailsPage = () => {
               
               {/* Product Header */}
               <div>
-                <div className="flex items-center space-x-2 text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                <div className="gsap-detail-badge flex items-center space-x-2 text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">
                   <Tag className="w-3.5 h-3.5" />
                   <span>{product.category || 'Garment Collection'}</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="gsap-detail-title text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                   {product.name}
                 </h1>
                 <p className="text-xs font-mono text-slate-400 mt-1">
@@ -287,7 +315,7 @@ const ProductDetailsPage = () => {
               </div>
 
               {/* Price Banner */}
-              <div className="p-4 bg-gradient-to-r from-amber-50/80 to-orange-50/50 border border-amber-200 rounded-2xl flex items-baseline space-x-3">
+              <div className="gsap-detail-price p-4 bg-gradient-to-r from-amber-50/80 to-orange-50/50 border border-amber-200 rounded-2xl flex items-baseline space-x-3">
                 <span className="text-3xl font-black text-slate-900">
                   {product.price}
                 </span>
@@ -312,7 +340,7 @@ const ProductDetailsPage = () => {
               </div>
 
               {/* Size Selector */}
-              <div className="space-y-2">
+              <div className="gsap-detail-sizes space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
                     Select Size: <span className="text-amber-700 font-mono font-bold">{selectedSize}</span>
@@ -371,7 +399,7 @@ const ProductDetailsPage = () => {
             </div>
 
             {/* Action Buttons & Feedback */}
-            <div className="space-y-3 pt-4 border-t border-slate-200">
+            <div className="gsap-detail-actions space-y-3 pt-4 border-t border-slate-200">
               {addedToast && (
                 <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-xl flex items-center justify-between animate-fadeIn">
                   <div className="flex items-center space-x-2">

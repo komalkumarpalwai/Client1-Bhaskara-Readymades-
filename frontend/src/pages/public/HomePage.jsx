@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { 
   ShoppingBag, 
   Sparkles, 
@@ -37,6 +39,35 @@ const HomePage = () => {
   const [addedToastId, setAddedToastId] = useState(null);
 
   const { addToCart } = useCart();
+
+  // GSAP animation container refs
+  const heroContainerRef = useRef(null);
+  const productGridRef = useRef(null);
+  const showcaseRef = useRef(null);
+
+  // Hero Section GSAP entrance timeline
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.8 } });
+
+    tl.from('.gsap-hero-badge', { y: -15, opacity: 0, duration: 0.6 })
+      .from('.gsap-hero-title', { y: 25, opacity: 0, duration: 0.8 }, '-=0.3')
+      .from('.gsap-hero-desc', { y: 20, opacity: 0, duration: 0.7 }, '-=0.5')
+      .from('.gsap-hero-cta', { y: 20, opacity: 0, stagger: 0.12, duration: 0.6 }, '-=0.4');
+  }, { scope: heroContainerRef });
+
+  // Product Grid Staggered GSAP Reveal on loading finish or tab change
+  useGSAP(() => {
+    if (!loading && products.length > 0) {
+      gsap.from('.gsap-product-card', {
+        y: 35,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.65,
+        ease: 'power2.out',
+        clearProps: 'transform,opacity'
+      });
+    }
+  }, { dependencies: [loading, activeTab, currentPage], scope: productGridRef });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -85,167 +116,58 @@ const HomePage = () => {
 
   return (
     <div className="space-y-16 pb-16">
-      {/* HERO SECTION WITH SHOWROOM BACKGROUND IMAGE */}
-      <section className="relative overflow-hidden bg-slate-950 text-white min-h-[580px] sm:min-h-[640px] flex items-center">
-        {/* Full-width High Resolution Background Image */}
+      {/* CLEAN & SPACIOUS FASHION HERO SECTION */}
+      <section ref={heroContainerRef} className="relative overflow-hidden min-h-[520px] sm:min-h-[580px] lg:min-h-[620px] flex items-center">
+        {/* Full High-Resolution Family Fashion Background Image */}
         <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat scale-105 transform motion-safe:transition-transform duration-1000"
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transform scale-100 transition-transform duration-700"
           style={{ backgroundImage: `url("${showroomBanner}")` }}
         ></div>
 
-        {/* Multi-layered Premium Dark Vignette & Glass Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/85 to-slate-950/70"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/60"></div>
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Subtle Warm / Neutral Ambient Gradient Overlay (Preserves Full Image Visibility) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent sm:w-3/4 lg:w-3/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 sm:py-24 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="max-w-2xl space-y-5 text-left text-white">
             
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-amber-400/20 backdrop-blur-md border border-amber-400/40 text-amber-300 text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Premier Readymade Showroom in Saripalli</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight drop-shadow-md">
-                Bhaskara <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-orange-400">Readymades</span>
-              </h1>
-
-              <p className="text-slate-200 text-sm sm:text-base max-w-2xl leading-relaxed drop-shadow">
-                Experience authentic, high-quality family clothing. Featuring exclusive Men’s Shirts & Kurtas, Women’s Designer Sarees & Kurtis, and vibrant Kids' Wear directly from our Ganapavaram store.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-                <Link
-                  to="/shop"
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold px-8 py-3.5 rounded-xl text-sm flex items-center justify-center space-x-2 shadow-xl shadow-amber-500/25 transition-all transform hover:-translate-y-0.5"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Explore Catalogue ({products.length} Items)</span>
-                </Link>
-
-                <Link
-                  to="/contact"
-                  className="w-full sm:w-auto border border-white/20 hover:border-white/40 bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white font-semibold px-6 py-3.5 rounded-xl text-sm flex items-center justify-center space-x-2 transition shadow-lg"
-                >
-                  <MapPin className="w-4 h-4 text-amber-400" />
-                  <span>Store Directions</span>
-                </Link>
-              </div>
-
-              {/* Badges Bar */}
-              <div className="pt-6 border-t border-white/10 grid grid-cols-3 gap-4 text-center">
-                <div className="bg-white/5 backdrop-blur-sm p-2 rounded-xl border border-white/5">
-                  <div className="text-base sm:text-lg font-bold text-amber-300">100% Cotton</div>
-                  <div className="text-[10px] sm:text-[11px] text-slate-300">Comfort Tested</div>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-2 rounded-xl border border-white/5">
-                  <div className="text-base sm:text-lg font-bold text-amber-300">Best Price</div>
-                  <div className="text-[10px] sm:text-[11px] text-slate-300">Direct From Mills</div>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-2 rounded-xl border border-white/5">
-                  <div className="text-base sm:text-lg font-bold text-amber-300">Saripalli, AP</div>
-                  <div className="text-[10px] sm:text-[11px] text-slate-300">Ganapavaram 534198</div>
-                </div>
-              </div>
+            {/* Small Badge */}
+            <div className="gsap-hero-badge inline-flex items-center space-x-2 bg-amber-400/25 backdrop-blur-md border border-amber-300/40 text-amber-200 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Bhaskara Readymades</span>
             </div>
 
-            {/* Hero Visual Display (Live Top Categories & Fast Showcase) */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full max-w-sm bg-slate-900/80 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
-                <div className="flex justify-between items-center text-xs font-mono text-amber-400 border-b border-white/10 pb-3">
-                  <span className="flex items-center space-x-1.5 font-bold">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>POPULAR STORE CATEGORIES</span>
-                  </span>
-                  <span className="flex items-center space-x-1.5 text-emerald-400 font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>LIVE SYNC</span>
-                  </span>
-                </div>
+            {/* Main Heading */}
+            <h1 className="gsap-hero-title text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] drop-shadow-md">
+              Style for Every <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-orange-300">Generation</span>
+            </h1>
 
-                {/* Dynamic Category List */}
-                <div className="space-y-2.5">
-                  {[
-                    { 
-                      id: 'men', 
-                      name: "Men's Collection", 
-                      sub: "Formal Shirts, Kurtas & Trousers", 
-                      link: "/category/men",
-                      tabId: "shirts",
-                      badge: "MEN",
-                      color: "from-blue-500/20 to-indigo-500/20 text-blue-300 border-blue-400/30",
-                      count: products.filter(p => ['Shirts', 'Trousers', 'Ethnic Wear'].includes(p.category)).length || 12
-                    },
-                    { 
-                      id: 'women', 
-                      name: "Women's Collection", 
-                      sub: "Designer Sarees, Kurtis & Dresses", 
-                      link: "/category/women",
-                      tabId: "women",
-                      badge: "WOMEN",
-                      color: "from-rose-500/20 to-pink-500/20 text-rose-300 border-rose-400/30",
-                      count: products.filter(p => ['Kurtis', 'Sarees', 'Dresses', 'Tops', 'Bottom Wear'].includes(p.category)).length || 18
-                    },
-                    { 
-                      id: 'kids', 
-                      name: "Kids' Readymades", 
-                      sub: "Boys & Girls Festive Wear", 
-                      link: "/category/kids",
-                      tabId: "kids",
-                      badge: "KIDS",
-                      color: "from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-400/30",
-                      count: products.filter(p => ['Boys Wear', 'Girls Wear'].includes(p.category)).length || 8
-                    },
-                    { 
-                      id: 'ethnic', 
-                      name: "Ethnic & Festive Sarees", 
-                      sub: "Traditional Silk & Handloom Wear", 
-                      link: "/category/women",
-                      tabId: "ethnic",
-                      badge: "ETHNIC",
-                      color: "from-emerald-500/20 to-teal-500/20 text-emerald-300 border-emerald-400/30",
-                      count: products.filter(p => ['Ethnic Wear', 'Sarees'].includes(p.category)).length || 10
-                    }
-                  ].map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={cat.link}
-                      className="flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center font-black text-[11px] border group-hover:scale-105 transition-transform`}>
-                          {cat.badge}
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
-                            {cat.name}
-                          </h4>
-                          <span className="text-[10px] text-slate-400 line-clamp-1">{cat.sub}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1.5 text-xs font-mono font-bold text-amber-300">
-                        <span>{cat.count} Items</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+            {/* Supporting Text */}
+            <p className="gsap-hero-desc text-slate-100 text-base sm:text-lg leading-relaxed font-medium drop-shadow max-w-xl">
+              Discover quality men's, women's and kids' readymade clothing for every occasion.
+            </p>
 
-                <div className="text-center pt-1">
-                  <a
-                    href="#featured-collections"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById('featured-collections')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="text-xs text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center space-x-1 cursor-pointer"
-                  >
-                    <span>Browse {products.length} live garments below</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3.5 pt-3">
+              <Link
+                to="/shop"
+                className="gsap-hero-cta bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold px-8 py-3.5 rounded-xl text-sm flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>Shop Collection</span>
+              </Link>
+
+              <a
+                href="#featured-collections"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('featured-collections')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="gsap-hero-cta border-2 border-white/40 hover:border-white bg-black/30 backdrop-blur-md hover:bg-black/50 text-white font-bold px-7 py-3.5 rounded-xl text-sm flex items-center justify-center space-x-2 transition shadow-md hover:-translate-y-0.5"
+              >
+                <span>Explore Categories</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
             </div>
 
           </div>
@@ -294,12 +216,12 @@ const HomePage = () => {
             No products found in this category collection.
           </div>
         ) : (
-          <div className="space-y-6">
+          <div ref={productGridRef} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {paginatedFeatured.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
+                  className="gsap-product-card bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group"
                 >
                   {/* Visual Header / Thumbnail Image */}
                   <Link to={`/products/${product.id}`} className="block">
