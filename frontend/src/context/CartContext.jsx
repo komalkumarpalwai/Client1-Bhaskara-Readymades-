@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import AddedToCartToast from '../components/common/AddedToCartToast.jsx';
 
 export const CartContext = createContext(null);
 
@@ -12,6 +13,9 @@ export const CartProvider = ({ children }) => {
       return [];
     }
   });
+
+  const [lastAddedNotification, setLastAddedNotification] = useState(null);
+  const toastTimeoutRef = useRef(null);
 
   useEffect(() => {
     try {
@@ -52,11 +56,27 @@ export const CartProvider = ({ children }) => {
             numericPrice: product.numericPrice || (typeof product.price === 'string' ? parseFloat(product.price.replace(/[^\d.]/g, '')) : product.price) || 0,
             selectedSize: size,
             quantity: quantity,
-            addedAt: new Date().toISOString()
+            addedAt: new Date().toISOString(),
+            imageUrl: product.imageUrl || (product.images && product.images[0]) || ''
           }
         ];
       }
     });
+
+    // Trigger neat "Added to Cart" popup animation
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setLastAddedNotification({
+      product,
+      size,
+      quantity,
+      id: Date.now()
+    });
+
+    toastTimeoutRef.current = setTimeout(() => {
+      setLastAddedNotification(null);
+    }, 4000);
   };
 
   const updateQuantity = (productId, size, newQty) => {
@@ -84,6 +104,13 @@ export const CartProvider = ({ children }) => {
     setItems([]);
   };
 
+  const closeNotification = () => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setLastAddedNotification(null);
+  };
+
   const value = useMemo(
     () => ({
       items,
@@ -97,7 +124,15 @@ export const CartProvider = ({ children }) => {
     [items, totalQuantity, subtotal]
   );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <AddedToCartToast
+        notification={lastAddedNotification}
+        onClose={closeNotification}
+      />
+    </CartContext.Provider>
+  );
 };
 
 export const useCart = () => {
